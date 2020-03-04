@@ -13,7 +13,7 @@ public class FetchAPIData {
     private final static Logger log = LoggerFactory.getLogger(CopyKeyValidation.class);
 
     public static JsonObject fetchLabels(String url) throws IOException {
-        log.info("Fetching Json data from API");
+        log.info("Fetching Json data from API - " + url);
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(url).build();
         Response responses = client.newCall(request).execute();

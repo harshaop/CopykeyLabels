@@ -1,6 +1,5 @@
 import com.google.gson.JsonObject;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -21,24 +20,22 @@ public class CopyKeyValidation {
 
     public static void main(String[] args) throws IOException, InvalidFormatException, ParserConfigurationException, SAXException {
 
-        String environment = "prod";
+        String environment = "prod", release = "20B", outFileName = "output-sheet101.xlsx";
+        // String environment = args[0], release = args[1].toUpperCase(), outFileName = args[2] + "-" + args[0].toUpperCase() + "-" + args[1].toUpperCase() + "-" + ".xlsx";
+        String filePath = getPath() + "_GOEP_Online-R" + release + "_import_labels.xml" + "\\" + "GOEP\\Online-R" + release + "\\import\\";
 
-        ArrayList<?> listOfLocales = test();
+        ArrayList<?> listOfLocales = inputLocaleFiles(filePath);
         for (Object localesXml : listOfLocales) {
-            log.info(localesXml.toString());
             String market = localesXml.toString().substring(7, 12).toLowerCase().replace("-", "_");
-            log.info(market);
-            log.info(createUrl(environment, market));
+            LinkedHashMap<String, String> xmlHMap = XmlReader.ReadXML(localesXml.toString(), filePath);
             JsonObject apiLabels = FetchAPIData.fetchLabels(createUrl(environment, market));
-            LinkedHashMap<String, String> hmap = xmlReader.ReadXML(localesXml.toString());
-            ExcelOperations.checkFileStatus();
-            copyValidation(hmap, apiLabels, environment, market);
+            ExcelOperations.checkFileIfExists(outFileName);
+            compareXmlApi(xmlHMap, apiLabels, outFileName, market);
         }
     }
 
-
-    private static void copyValidation(LinkedHashMap<String, String> hmap, JsonObject apiLabels, String environment, String market) throws IOException, InvalidFormatException {
-        log.info("Comparing XML COPY and Api COPY response and adding to excel file");
+    private static void compareXmlApi(LinkedHashMap<String, String> hmap, JsonObject apiLabels, String outFileName, String market) throws IOException, InvalidFormatException {
+        log.info("Comparing XML Copy Label and API Copy Label response and adding difference Labels to excel file:" + outFileName);
         Set<?> set = hmap.entrySet();
         for (Object o : set) {
             Map.Entry<?, ?> entry = (Map.Entry<?, ?>) o;
@@ -49,10 +46,11 @@ public class CopyKeyValidation {
                 apiLabel = apiLabelQ.substring(1, apiLabelQ.length() - 1).replace("\\\"", "\"");
 
             if (!String.valueOf(entry.getValue()).equals(apiLabel)) {
-                ExcelOperations.logToWorkbook(String.valueOf(entry.getKey()), String.valueOf(entry.getValue()), apiLabel, environment, market);
-                log.info("key is: " + "\"" + entry.getKey() + "\"" + "\n" + "Value from Smartling XML file is : " + "\"" + entry.getValue() + "\"" + "\n" + "Value from api Request is: " + "\"" + apiLabel + "\"" + "\n");
+                ExcelOperations.logToWorkbook(String.valueOf(entry.getKey()), String.valueOf(entry.getValue()), apiLabel, outFileName, market);
+                log.debug("key is: " + "\"" + entry.getKey() + "\"" + "\n" + "Value from Smartling XML file is : " + "\"" + entry.getValue() + "\"" + "\n" + "Value from api Request is: " + "\"" + apiLabel + "\"" + "\n");
             }
         }
+        log.info("Logging for " + market.toUpperCase() + " made to excel file: " + outFileName);
     }
 
     private static String createUrl(String env, String market) {
@@ -70,12 +68,8 @@ public class CopyKeyValidation {
         return "https://" + env + "www2.hm.com/" + market + "/v1/labels";
     }
 
-    private static ArrayList<String> test() {
-        String path = getPath();
-        log.info(path);
-        log.info(path + "GOEP\\Online-R20B\\import\\");
-
-        File folder = new File(path + "GOEP\\Online-R20B\\import\\");
+    private static ArrayList<String> inputLocaleFiles(String filePath) {
+        File folder = new File(filePath);
         File[] listOfFiles = folder.listFiles();
         ArrayList<String> listOfFileNames = new ArrayList<>();
         assert listOfFiles != null;
@@ -93,7 +87,6 @@ public class CopyKeyValidation {
         return listOfFileNames;
     }
 
-    @NotNull
     private static String getPath() {
         Path currentRelativePath = Paths.get("");
         return currentRelativePath.toAbsolutePath().toString() + "\\";
