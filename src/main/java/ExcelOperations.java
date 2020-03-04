@@ -20,7 +20,7 @@ public class ExcelOperations {
     private static final String OUTPUT_FILE_NAME = "Output-Sheet.xlsx";
 
 
-    public static void modifyWorkbook(String key, String excel, String api, String env, String mkt) throws InvalidFormatException, IOException {
+    public static void logToWorkbook(String key, String excel, String api, String env, String mkt) throws InvalidFormatException, IOException {
         log.debug("Adding entry to excel file");
 
         Workbook workbook = new XSSFWorkbook(new FileInputStream(OUTPUT_FILE_NAME));

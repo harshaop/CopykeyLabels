@@ -1,3 +1,4 @@
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -11,16 +12,16 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 
 public class xmlReader {
     private final static Logger log = LoggerFactory.getLogger(CopyKeyValidation.class);
 
-    public static LinkedHashMap<String, String> ReadXML(String mkt) throws IOException, SAXException, ParserConfigurationException {
-        String localeLanguage = mkt.substring(0, 2);
-        String localeCountry = mkt.substring(3, 5).toUpperCase();
-
-        File fXmlFile = new File("labels_" + localeLanguage + "-" + localeCountry + ".xml");
+    public static LinkedHashMap<String, String> ReadXML(String xml) throws IOException, SAXException, ParserConfigurationException {
+        String path = getPath();
+        File fXmlFile = new File(path + "\\GOEP\\Online-R20B\\import\\" + xml);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         Document doc = dBuilder.parse(fXmlFile);
@@ -46,5 +47,11 @@ public class xmlReader {
             }
         }
         return hmap;
+    }
+
+    @NotNull
+    private static String getPath() {
+        Path currentRelativePath = Paths.get("");
+        return currentRelativePath.toAbsolutePath().toString() + "\\";
     }
 }
