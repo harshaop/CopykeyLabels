@@ -20,8 +20,8 @@ public class CopyKeyValidation {
 
     public static void main(String[] args) throws IOException, InvalidFormatException, ParserConfigurationException, SAXException {
 
-        String environment = "prod", release = "20B", outFileName = "output-sheet101.xlsx";
-        // String environment = args[0], release = args[1].toUpperCase(), outFileName = args[2] + "-" + args[0].toUpperCase() + "-" + args[1].toUpperCase() + "-" + ".xlsx";
+        //  String environment = "prod", release = "20B", outFileName = "output-sheet101.xlsx";
+        String environment = args[0], release = args[1].toUpperCase(), outFileName = args[2] + "-" + args[0].toUpperCase() + "-" + args[1].toUpperCase() + "-" + ".xlsx";
         String filePath = getPath() + "_GOEP_Online-R" + release + "_import_labels.xml" + "\\" + "GOEP\\Online-R" + release + "\\import\\";
 
         ArrayList<?> listOfLocales = inputLocaleFiles(filePath);
