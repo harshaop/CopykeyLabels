@@ -18,16 +18,20 @@ import java.util.Set;
 public class CopyKeyValidation {
     private final static Logger log = LoggerFactory.getLogger(CopyKeyValidation.class);
 
-    public static void main(String[] args) throws IOException, InvalidFormatException, ParserConfigurationException, SAXException {
+    public static void main(String[] args) throws Exception {
 
-        //  String environment = "prod", release = "20B", outFileName = "output-sheet101.xlsx";
-        String environment = args[0], release = args[1].toUpperCase(), outFileName = args[2] + "-" + args[0].toUpperCase() + "-" + args[1].toUpperCase() + "-" + ".xlsx";
-        String filePath = getPath() + "_GOEP_Online-R" + release + "_import_labels.xml" + "\\" + "GOEP\\Online-R" + release + "\\import\\";
+          String environment = "prod", release = "20B", outFileName = "output-sheet101.xlsx";
+          String home = System.getProperty("user.home");
+        //String environment = args[0], release = args[1].toUpperCase(), outFileName = args[2] + "-" + args[0].toUpperCase() + "-" + args[1].toUpperCase() + "-" + ".xlsx";
+String filePath =  File.separator+ "GOEP"+File.separator + "Online-R20B"  +File.separator +"import"+File.separator;
+
+
 
         ArrayList<?> listOfLocales = inputLocaleFiles(filePath);
         for (Object localesXml : listOfLocales) {
             String market = localesXml.toString().substring(7, 12).toLowerCase().replace("-", "_");
-            LinkedHashMap<String, String> xmlHMap = XmlReader.ReadXML(localesXml.toString(), filePath);
+
+            LinkedHashMap<String, String> xmlHMap = XmlReader.ReadXML(localesXml.toString(),filePath );
             JsonObject apiLabels = FetchAPIData.fetchLabels(createUrl(environment, market));
             ExcelOperations.checkFileIfExists(outFileName);
             compareXmlApi(xmlHMap, apiLabels, outFileName, market);
@@ -69,7 +73,7 @@ public class CopyKeyValidation {
     }
 
     private static ArrayList<String> inputLocaleFiles(String filePath) {
-        File folder = new File(filePath);
+        File folder = new File("." + filePath );
         File[] listOfFiles = folder.listFiles();
         ArrayList<String> listOfFileNames = new ArrayList<>();
         assert listOfFiles != null;
@@ -77,19 +81,20 @@ public class CopyKeyValidation {
             if (listOfFile.isFile()) {
                 assert false;
                 listOfFileNames.add(listOfFile.getName());
-                log.debug(listOfFileNames.toString());
-                log.debug("File " + listOfFile.getName());
+                log.info(listOfFileNames.toString());
+                log.info("File " + listOfFile.getName());
             } else if (listOfFile.isDirectory()) {
-                log.debug("Directory " + listOfFile.getName());
+                log.info("Directory " + listOfFile.getName());
             }
         }
-        log.debug(listOfFileNames.toString());
+        log.info(listOfFileNames.toString());
         return listOfFileNames;
     }
 
     private static String getPath() {
         Path currentRelativePath = Paths.get("");
-        return currentRelativePath.toAbsolutePath().toString() + "\\";
+        log.info("crp:"+currentRelativePath.toString());
+        return currentRelativePath.toAbsolutePath().toString() + File.separator;
     }
 }
 
