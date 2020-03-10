@@ -2,9 +2,7 @@ import com.google.gson.JsonObject;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -20,7 +18,7 @@ public class CopyKeyValidation {
 
     public static void main(String[] args) throws Exception {
         if (args.length != 3) {
-            System.out.println("Usage: Java -Jar "+CopyKeyValidation.class.getName()+".jar <ENVIROMENT(INT,AMT,TST,PROD> <CopySource(20A,20B)>, <Output FileName>");
+            System.out.println("Usage: Java -Jar " + CopyKeyValidation.class.getName() + ".jar <ENVIROMENT(INT,AMT,TST,PROD>, <CopySource(20A,20B)>, <Output FileName>");
             System.exit(1);
         }
 
@@ -60,17 +58,8 @@ public class CopyKeyValidation {
     }
 
     private static String createUrl(String env, String market) {
-        switch (env) {
-            case "int":
-            case "amt":
-            case "tst":
-                env = env + "-";
-                break;
-            case "":
-            case "prod":
-                env = "";
-                break;
-        }
+        if (env.equalsIgnoreCase("prod")) env = "";
+        else env += "-";
         return "https://" + env + "www2.hm.com/" + market + "/v1/labels";
     }
 
