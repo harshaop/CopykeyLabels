@@ -22,9 +22,7 @@ public class XmlReader {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         Document doc = dBuilder.parse(fXmlFile);
-
         doc.getDocumentElement().normalize();
-
         NodeList nList = doc.getElementsByTagName("translation");
         LinkedHashMap<String, String> hmap = new LinkedHashMap<>();
         for (int temp = 0; temp < nList.getLength(); temp++) {

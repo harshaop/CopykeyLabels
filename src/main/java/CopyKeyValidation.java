@@ -1,5 +1,4 @@
 import com.google.gson.JsonObject;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,19 +17,19 @@ public class CopyKeyValidation {
 
     public static void main(String[] args) throws Exception {
         if (args.length != 3) {
-            System.out.println("Usage: Java -Jar " + CopyKeyValidation.class.getName() + ".jar <ENVIROMENT(INT,AMT,TST,PROD>, <CopySource(20A,20B)>, <Output FileName>");
+            System.out.println("Usage: Java -Jar " + CopyKeyValidation.class.getName() + ".jar <ENVIROMENT(INT,AMT,TST,PROD)>, <CopySource(20A,20B)>, <Output FileName>");
             System.exit(1);
         }
 
-        //String environment = "prod", release = "20B", outFileName = "output-sheet101.xlsx";
         String environment = args[0], release = args[1].toUpperCase(), outFileName = args[2] + "-" + args[0].toUpperCase() + "-" + args[1].toUpperCase() + "-" + ".xlsx";
+        //  String environment = "int", release = "20B", outFileName = "output-sheet101.xlsx";
+
         String filePath = getPath() + "GOEP" + File.separator + "Online-R20B" + File.separator + "import" + File.separator;
         log.info(filePath);
 
         ArrayList<?> listOfLocales = inputLocaleFiles(filePath);
         for (Object localesXml : listOfLocales) {
             String market = localesXml.toString().substring(7, 12).toLowerCase().replace("-", "_");
-
             LinkedHashMap<String, String> xmlHMap = XmlReader.ReadXML(localesXml.toString(), filePath);
             JsonObject apiLabels = FetchAPIData.fetchLabels(createUrl(environment, market));
             ExcelOperations.checkFileIfExists(outFileName);
@@ -38,11 +37,11 @@ public class CopyKeyValidation {
         }
     }
 
-    private static void compareXmlApi(LinkedHashMap<String, String> hmap, JsonObject apiLabels, String outFileName, String market) throws IOException, InvalidFormatException {
-        log.info("Comparing XML Copy Label and API Copy Label response and adding difference Labels to excel file:" + outFileName);
+    private static void compareXmlApi(LinkedHashMap<String, String> hmap, JsonObject apiLabels, String outFileName, String market) throws IOException {
+        log.info("Comparing XML Smartling Copy Label and API Copy Label response and adding difference Labels to excel file:" + outFileName);
         Set<?> set = hmap.entrySet();
-        for (Object o : set) {
-            Map.Entry<?, ?> entry = (Map.Entry<?, ?>) o;
+        for (Object object : set) {
+            Map.Entry<?, ?> entry = (Map.Entry<?, ?>) object;
             String apiLabelQ = String.valueOf(apiLabels.get(entry.getKey().toString()));
             String apiLabel = "";
 
@@ -54,7 +53,7 @@ public class CopyKeyValidation {
                 log.debug("key is: " + "\"" + entry.getKey() + "\"" + "\n" + "Value from Smartling XML file is : " + "\"" + entry.getValue() + "\"" + "\n" + "Value from api Request is: " + "\"" + apiLabel + "\"" + "\n");
             }
         }
-        log.info("Logging for " + market.toUpperCase() + " made to excel file: " + outFileName);
+        log.info("Logging for \"" + market.toUpperCase() + "\" made to excel file: " + outFileName);
     }
 
     private static String createUrl(String env, String market) {
@@ -68,16 +67,10 @@ public class CopyKeyValidation {
         File[] listOfFiles = folder.listFiles();
         ArrayList<String> listOfFileNames = new ArrayList<>();
         assert listOfFiles != null;
-        for (File listOfFile : listOfFiles) {
-            if (listOfFile.isFile()) {
-                assert false;
+        for (File listOfFile : listOfFiles)
+            if (listOfFile.isFile())
                 listOfFileNames.add(listOfFile.getName());
-                log.debug("File " + listOfFile.getName());
-            } else if (listOfFile.isDirectory()) {
-                log.debug("Directory " + listOfFile.getName());
-            }
-        }
-        log.debug(listOfFileNames.toString());
+        log.info("List of filenames found for validation:" + listOfFileNames.toString());
         return listOfFileNames;
     }
 

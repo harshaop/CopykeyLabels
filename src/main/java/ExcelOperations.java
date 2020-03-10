@@ -1,4 +1,3 @@
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -16,7 +15,7 @@ import java.nio.file.Paths;
 public class ExcelOperations {
     private final static Logger log = LoggerFactory.getLogger(CopyKeyValidation.class);
 
-    public static void logToWorkbook(String key, String excel, String api, String fileName, String mkt) throws InvalidFormatException, IOException {
+    public static void logToWorkbook(String key, String excel, String api, String fileName, String mkt) throws IOException {
         log.debug("Adding entry to excel file");
         Workbook workbook = new XSSFWorkbook(new FileInputStream(fileName));
         String sheetName = mkt.toUpperCase();
@@ -28,7 +27,7 @@ public class ExcelOperations {
             Row row = sheet.createRow(0);
             row.createCell(0).setCellValue("Key");
             row.createCell(1).setCellValue("Label Description - Smartling");
-            row.createCell(2).setCellValue("Label Description - API");
+            row.createCell(2).setCellValue("Label Description - FrontEnd-API");
             sheet.setAutoFilter(new CellRangeAddress(0, 0, 0, 3));
         }
 
