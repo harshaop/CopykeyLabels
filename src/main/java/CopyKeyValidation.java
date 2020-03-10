@@ -20,18 +20,16 @@ public class CopyKeyValidation {
 
     public static void main(String[] args) throws Exception {
 
-          String environment = "prod", release = "20B", outFileName = "output-sheet101.xlsx";
-          String home = System.getProperty("user.home");
-        //String environment = args[0], release = args[1].toUpperCase(), outFileName = args[2] + "-" + args[0].toUpperCase() + "-" + args[1].toUpperCase() + "-" + ".xlsx";
-String filePath =  File.separator+ "GOEP"+File.separator + "Online-R20B"  +File.separator +"import"+File.separator;
-
-
+        //String environment = "prod", release = "20B", outFileName = "output-sheet101.xlsx";
+        String environment = args[0], release = args[1].toUpperCase(), outFileName = args[2] + "-" + args[0].toUpperCase() + "-" + args[1].toUpperCase() + "-" + ".xlsx";
+        String filePath = getPath() + "GOEP" + File.separator + "Online-R20B" + File.separator + "import" + File.separator;
+        log.info(filePath);
 
         ArrayList<?> listOfLocales = inputLocaleFiles(filePath);
         for (Object localesXml : listOfLocales) {
             String market = localesXml.toString().substring(7, 12).toLowerCase().replace("-", "_");
 
-            LinkedHashMap<String, String> xmlHMap = XmlReader.ReadXML(localesXml.toString(),filePath );
+            LinkedHashMap<String, String> xmlHMap = XmlReader.ReadXML(localesXml.toString(), filePath);
             JsonObject apiLabels = FetchAPIData.fetchLabels(createUrl(environment, market));
             ExcelOperations.checkFileIfExists(outFileName);
             compareXmlApi(xmlHMap, apiLabels, outFileName, market);
@@ -73,7 +71,7 @@ String filePath =  File.separator+ "GOEP"+File.separator + "Online-R20B"  +File.
     }
 
     private static ArrayList<String> inputLocaleFiles(String filePath) {
-        File folder = new File("." + filePath );
+        File folder = new File(filePath);
         File[] listOfFiles = folder.listFiles();
         ArrayList<String> listOfFileNames = new ArrayList<>();
         assert listOfFiles != null;
@@ -81,19 +79,17 @@ String filePath =  File.separator+ "GOEP"+File.separator + "Online-R20B"  +File.
             if (listOfFile.isFile()) {
                 assert false;
                 listOfFileNames.add(listOfFile.getName());
-                log.info(listOfFileNames.toString());
-                log.info("File " + listOfFile.getName());
+                log.debug("File " + listOfFile.getName());
             } else if (listOfFile.isDirectory()) {
-                log.info("Directory " + listOfFile.getName());
+                log.debug("Directory " + listOfFile.getName());
             }
         }
-        log.info(listOfFileNames.toString());
+        log.debug(listOfFileNames.toString());
         return listOfFileNames;
     }
 
     private static String getPath() {
         Path currentRelativePath = Paths.get("");
-        log.info("crp:"+currentRelativePath.toString());
         return currentRelativePath.toAbsolutePath().toString() + File.separator;
     }
 }

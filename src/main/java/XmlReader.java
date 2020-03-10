@@ -18,7 +18,7 @@ public class XmlReader {
 
     public static LinkedHashMap<String, String> ReadXML(String xml, String filePath) throws IOException, SAXException, ParserConfigurationException {
         log.info("Reading XML File: " + xml);
-        File fXmlFile = new File( "."+filePath+ xml);
+        File fXmlFile = new File(filePath + xml);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         Document doc = dBuilder.parse(fXmlFile);
@@ -33,7 +33,7 @@ public class XmlReader {
                 Element eElement = (Element) nNode;
 
                 if (eElement.getAttribute("system").equals("hybris") & eElement.getAttribute("subsystem").equals("frontend")) {
-                    log.info("key : " + eElement.getAttribute("key"));
+                    log.debug("key : " + eElement.getAttribute("key"));
                     log.debug("Translation : " + eElement.getTextContent());
                     String translation = eElement.getTextContent().replaceAll("[\r\n]", "");
                     hmap.put(eElement.getAttribute("key"), translation);
