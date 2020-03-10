@@ -19,6 +19,10 @@ public class CopyKeyValidation {
     private final static Logger log = LoggerFactory.getLogger(CopyKeyValidation.class);
 
     public static void main(String[] args) throws Exception {
+        if (args.length != 3) {
+            System.out.println("Usage: Java -Jar "+CopyKeyValidation.class.getName()+".jar <ENVIROMENT(INT,AMT,TST,PROD> <CopySource(20A,20B)>, <Output FileName>");
+            System.exit(1);
+        }
 
         //String environment = "prod", release = "20B", outFileName = "output-sheet101.xlsx";
         String environment = args[0], release = args[1].toUpperCase(), outFileName = args[2] + "-" + args[0].toUpperCase() + "-" + args[1].toUpperCase() + "-" + ".xlsx";
