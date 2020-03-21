@@ -1,4 +1,3 @@
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -28,7 +27,7 @@ public class ExcelOperations {
             Row row = sheet.createRow(0);
             row.createCell(0).setCellValue("Key");
             row.createCell(1).setCellValue("Label Description - Smartling");
-            row.createCell(2).setCellValue("Label Description - API");
+            row.createCell(2).setCellValue("Label Description - FrontEnd-API");
             sheet.setAutoFilter(new CellRangeAddress(0, 0, 0, 3));
         }
 
