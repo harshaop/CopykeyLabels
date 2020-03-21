@@ -15,13 +15,14 @@ import java.security.cert.X509Certificate;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+
 public class FetchAPIData {
     private final static Logger log = LoggerFactory.getLogger(CopyKeyValidation.class);
 
-    public static JsonObject fetchLabels(String url) throws Exception {
+    public  JsonObject fetchLabels(String url) throws Exception {
         log.info("Fetching Json data from API - " + url);
 
-        System.setProperty("org.jboss.security.ignoreHttpsHost","true");
+        //System.setProperty("org.jboss.security.ignoreHttpsHost","true");
 
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(url).build();

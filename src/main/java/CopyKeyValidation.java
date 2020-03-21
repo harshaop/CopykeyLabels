@@ -2,9 +2,7 @@ import com.google.gson.JsonObject;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -19,44 +17,49 @@ public class CopyKeyValidation {
     private final static Logger log = LoggerFactory.getLogger(CopyKeyValidation.class);
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 3) {
-            System.out.println("Usage: Java -Jar "+CopyKeyValidation.class.getName()+".jar <ENVIROMENT(INT,AMT,TST,PROD> <CopySource(20A,20B)>, <Output FileName>");
-            System.exit(1);
-        }
 
-        //String environment = "prod", release = "20B", outFileName = "output-sheet101.xlsx";
-        String environment = args[0], release = args[1].toUpperCase(), outFileName = args[2] + "-" + args[0].toUpperCase() + "-" + args[1].toUpperCase() + "-" + ".xlsx";
+
+        String environment = "prod", release = "20B", outFileName = "output-sheet101.xlsx";
+        //String environment = args[0].toUpperCase(), release = args[1].toUpperCase(), inFileName = args[2];
+        //String outFileName = inFileName + "-" + environment + "-" + release + "-" + ".xlsx";
+
         String filePath = getPath() + "GOEP" + File.separator + "Online-R20B" + File.separator + "import" + File.separator;
         log.info(filePath);
 
-        ArrayList<?> listOfLocales = inputLocaleFiles(filePath);
-        for (Object localesXml : listOfLocales) {
-            String market = localesXml.toString().substring(7, 12).toLowerCase().replace("-", "_");
+        ArrayList<String> listOfLocaleFiles = fetchLocaleFiles(filePath);
+        for (String localesXml : listOfLocaleFiles) {
+            String locale = localesXml.substring(7, 12).toLowerCase().replace("-", "_");
 
-            LinkedHashMap<String, String> xmlHMap = XmlReader.ReadXML(localesXml.toString(), filePath);
-            JsonObject apiLabels = FetchAPIData.fetchLabels(createUrl(environment, market));
-            ExcelOperations.checkFileIfExists(outFileName);
-            compareXmlApi(xmlHMap, apiLabels, outFileName, market);
+            LinkedHashMap<String, String> xmlHMap = XmlReader.readXML(localesXml, filePath);
+            JsonObject apiLabels = new FetchAPIData().fetchLabels(createUrl(environment, locale));
+            compareXmlAndLogOutputToFile(xmlHMap, apiLabels, outFileName, locale);
         }
     }
 
-    private static void compareXmlApi(LinkedHashMap<String, String> hmap, JsonObject apiLabels, String outFileName, String market) throws IOException, InvalidFormatException {
-        log.info("Comparing XML Copy Label and API Copy Label response and adding difference Labels to excel file:" + outFileName);
+    private static void compareXmlAndLogOutputToFile(LinkedHashMap<String, String> hmap, JsonObject apiLabels, String outFileName, String locale) throws IOException {
+        new ExcelOperations().createOutputFile(outFileName);
+        log.info("Comparing XML Copy Label and API Copy Label response and adding difference Labels to excel file: {}", outFileName);
         Set<?> set = hmap.entrySet();
         for (Object o : set) {
             Map.Entry<?, ?> entry = (Map.Entry<?, ?>) o;
-            String apiLabelQ = String.valueOf(apiLabels.get(entry.getKey().toString()));
+            String apiLabelQ = apiLabels.get(entry.getKey().toString()) != null ? String.valueOf(apiLabels.get(entry.getKey().toString())) : null;
             String apiLabel = "";
 
-            if (!apiLabelQ.equals("null"))
+            if (apiLabelQ != null)
                 apiLabel = apiLabelQ.substring(1, apiLabelQ.length() - 1).replace("\\\"", "\"");
 
-            if (!String.valueOf(entry.getValue()).equals(apiLabel)) {
-                ExcelOperations.logToWorkbook(String.valueOf(entry.getKey()), String.valueOf(entry.getValue()), apiLabel, outFileName, market);
+            if (isCopyKeyValueNotMatching(String.valueOf(entry.getValue()), apiLabel)) {
+                ExcelOperations.logToWorkbook(String.valueOf(entry.getKey()), String.valueOf(entry.getValue()), apiLabel, outFileName, locale);
                 log.debug("key is: " + "\"" + entry.getKey() + "\"" + "\n" + "Value from Smartling XML file is : " + "\"" + entry.getValue() + "\"" + "\n" + "Value from api Request is: " + "\"" + apiLabel + "\"" + "\n");
             }
         }
-        log.info("Logging for " + market.toUpperCase() + " made to excel file: " + outFileName);
+        log.info("Logging for " + locale.toUpperCase() + " made to excel file: " + outFileName);
+    }
+
+    private static boolean isCopyKeyValueNotMatching(String expectedValue, String actualValue){
+
+        return !expectedValue.equals(actualValue);
+
     }
 
     private static String createUrl(String env, String market) {
@@ -74,7 +77,7 @@ public class CopyKeyValidation {
         return "https://" + env + "www2.hm.com/" + market + "/v1/labels";
     }
 
-    private static ArrayList<String> inputLocaleFiles(String filePath) {
+    private static ArrayList<String> fetchLocaleFiles(String filePath) {
         File folder = new File(filePath);
         File[] listOfFiles = folder.listFiles();
         ArrayList<String> listOfFileNames = new ArrayList<>();

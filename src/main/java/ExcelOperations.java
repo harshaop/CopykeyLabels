@@ -16,7 +16,7 @@ import java.nio.file.Paths;
 public class ExcelOperations {
     private final static Logger log = LoggerFactory.getLogger(CopyKeyValidation.class);
 
-    public static void logToWorkbook(String key, String excel, String api, String fileName, String mkt) throws InvalidFormatException, IOException {
+    public static void logToWorkbook(String key, String excel, String api, String fileName, String mkt) throws IOException {
         log.debug("Adding entry to excel file");
         Workbook workbook = new XSSFWorkbook(new FileInputStream(fileName));
         String sheetName = mkt.toUpperCase();
@@ -44,9 +44,9 @@ public class ExcelOperations {
         workbook.close();
     }
 
-    public static void checkFileIfExists(String outFileName) throws IOException {
-        String path = Paths.get("").toAbsolutePath().toString() + "\\";
-        if (!new File(path + outFileName).isFile()) {
+    public void createOutputFile(String outFileName) throws IOException {
+        String path = Paths.get("").toAbsolutePath().toString() + File.separator;
+        if (!isFileExists(path, outFileName)) {
             log.info("Creating new Excel File for logging output " + outFileName);
             FileOutputStream fileOut = new FileOutputStream(path + outFileName);
             XSSFWorkbook workbook = new XSSFWorkbook();
@@ -54,5 +54,10 @@ public class ExcelOperations {
             workbook.close();
             fileOut.close();
         }
+    }
+
+    private boolean isFileExists(String path, String fileName){
+
+        return new File(path + fileName).isFile();
     }
 }

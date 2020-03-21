@@ -16,7 +16,7 @@ import java.util.LinkedHashMap;
 public class XmlReader {
     private final static Logger log = LoggerFactory.getLogger(CopyKeyValidation.class);
 
-    public static LinkedHashMap<String, String> ReadXML(String xml, String filePath) throws IOException, SAXException, ParserConfigurationException {
+    public static LinkedHashMap<String, String> readXML(String xml, String filePath) throws IOException, SAXException, ParserConfigurationException {
         log.info("Reading XML File: " + xml);
         File fXmlFile = new File(filePath + xml);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
