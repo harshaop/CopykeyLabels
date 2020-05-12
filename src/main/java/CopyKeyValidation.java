@@ -17,11 +17,14 @@ public class CopyKeyValidation {
     private final static Logger log = LoggerFactory.getLogger(CopyKeyValidation.class);
 
     public static void main(String[] args) throws Exception {
+        if (args.length != 3) {
+            System.out.println("Usage: Java -Jar "+CopyKeyValidation.class.getName()+".jar <ENVIRONMENT(INT,AMT,TST,PROD> <CopySource(20A,20B)>, <Output FileName>");
+            System.exit(1);
+        }
 
-
-        String environment = "prod", release = "20B", outFileName = "output-sheet101.xlsx";
-        //String environment = args[0].toUpperCase(), release = args[1].toUpperCase(), inFileName = args[2];
-        //String outFileName = inFileName + "-" + environment + "-" + release + "-" + ".xlsx";
+        //String environment = "prod", release = "20B", outFileName = "output-sheet101.xlsx";
+        String environment = args[0].toUpperCase(), release = args[1].toUpperCase(), inFileName = args[2];
+        String outFileName = inFileName + "-" + environment + "-" + release + "-" + ".xlsx";
 
         String filePath = getPath() + "GOEP" + File.separator + "Online-R20B" + File.separator + "import" + File.separator;
         log.info(filePath);
@@ -63,17 +66,8 @@ public class CopyKeyValidation {
     }
 
     private static String createUrl(String env, String market) {
-        switch (env) {
-            case "int":
-            case "amt":
-            case "tst":
-                env = env + "-";
-                break;
-            case "":
-            case "prod":
-                env = "";
-                break;
-        }
+        if (env.equalsIgnoreCase("prod")) env = "";
+        else env += "-";
         return "https://" + env + "www2.hm.com/" + market + "/v1/labels";
     }
 
