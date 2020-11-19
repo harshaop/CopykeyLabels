@@ -13,7 +13,7 @@ public class CopyKeyValidation {
 
     public static void main(String[] args) throws Exception {
         if (args.length != 3) {
-            System.out.println("Usage: Java -Jar " + CopyKeyValidation.class.getName() + ".jar <ENVIRONMENT(INT,AMT,TST,PROD> <CopySource(20A,20B)> <Country-Locale>");
+            System.out.println("Usage: Java -Jar " + CopyKeyValidation.class.getName() + ".jar <ENVIRONMENT(INT,AMT,O2T,PROD> <CopySource(20C, 21A)> <Country-Locale>");
             System.exit(1);
         }
 
